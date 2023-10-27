@@ -1,7 +1,9 @@
 import telebot
 from pymongo import MongoClient
 
+
 bot = telebot.TeleBot("5622719505:AAF5EWHGxI6dbkQqRu4JMwgNdIsoR6IuCTY")
+
 
 class DataBase:
 	def __init__(self):
@@ -10,12 +12,8 @@ class DataBase:
 		self.db = cluster["QuizBot"]
 		self.users = self.db["Users"]
 		self.questions = self.db["Questions"]
-		self.questions_count = len(list(self.questions.find({})))
 
-		# Новый раздел: Контент Уроков
-		# self.tutorials = self.db["Tutorials"]
-		# Новая функция: Количество Уроков
-		# self.tutorials_count = len(list(self.tutorials.find({})))
+		self.questions_count = len(list(self.questions.find({})))
 
 	def get_user(self, chat_id):
 		user = self.users.find_one({"chat_id": chat_id})
@@ -28,10 +26,7 @@ class DataBase:
 			"is_passing": False,
 			"is_passed": False,
 			"question_index": None,
-			"answers": [],
-			# Новая ячейка в базе данных информации пользователя: номер урока
-			# "tutorial_index": None
-
+			"answers": []
 		}
 
 		self.users.insert_one(user)
@@ -44,10 +39,6 @@ class DataBase:
 	def get_question(self, index):
 		return self.questions.find_one({"id": index})
 
-	# Добавление новой функции получения уроков с базы данных
-	# def get_tutorial(self, index):
-	# 	return self.tutorials.find_one({"id": index})
-
 db = DataBase()
 
 
@@ -55,9 +46,9 @@ db = DataBase()
 def start(message):
 	user = db.get_user(message.chat.id)
 
-	# if user["is_passed"]:
-	# 	bot.send_message(message.from_user.id, "Вы уже прошли этот курс.")
-	# 	return
+	if user["is_passed"]:
+		bot.send_message(message.from_user.id, "Вы прошли бесплатную пробную версию курса по джаз-вокалу. Для получения доступа к полной версии необходимо оформить подписку 👍😇")
+		return
 
 	if user["is_passing"]:
 		return
@@ -136,7 +127,7 @@ def get_question_message(user):
 		keyboard.row(telebot.types.InlineKeyboardButton(f"{chr(answer_index + 97)}) {answer}",
 														callback_data=f"?ans&{answer_index}"))
 
-	text = f"Вопрос №{user['question_index'] + 1}\n\n{question['text']}"
+	text = f"Урок №{user['question_index'] + 1}\n\n{question['text']}"
 
 	return {
 		"text": text,

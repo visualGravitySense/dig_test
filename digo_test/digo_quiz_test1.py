@@ -108,9 +108,9 @@ def get_question_message(user):
 		else:
 			smile = "😎"
 
-		text = f"Вы ответили правильно на {percents}% вопросов {smile}"
+		text = f"Вы прошли бесплатную пробную версию курса по джаз-вокалу. Для получения доступа к полной версии необходимо оформить подписку 👍😇"
 
-		db.set_user(user["chat_id"], {"is_passed": True, "is_passing": False})
+		db.set_user(user["chat_id"], {"is_passed": False, "is_passing": False})
 
 		return {
 			"text": text,
